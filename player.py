@@ -2,13 +2,13 @@ import json
 from math import ceil
 from database import search_for_item
 
-with open('storage/database/players.json') as players_data:
-    players = json.load(players_data)
-    players_data.close()
-
 
 class Player:
     def __init__(self, user):
+        with open('storage/database/players.json') as players_data:
+            players = json.load(players_data)
+            players_data.close()
+
         self.id = user
         self.player_data = players[user]
         self.name = self.player_data['Info']['Name']
@@ -232,4 +232,8 @@ class Player:
 
 
 def player_exists(username):
+    with open('storage/database/players.json') as players_data:
+        players = json.load(players_data)
+        players_data.close()
+
     return username in players

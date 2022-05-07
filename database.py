@@ -2,6 +2,22 @@ import os
 import json
 
 
+def register(user_id):
+    with open('storage/database/player_model.json', 'r') as model:
+        starter_data = json.load(model)
+        model.close()
+
+    with open('storage/database/players.json', 'r') as file:
+        players_list = json.load(file)
+        file.close()
+
+    players_list[user_id] = starter_data['id']
+    players_list[user_id]['Info']['Name'] = user_id
+
+    with open('storage/database/players.json', 'w') as file:
+        json.dump(players_list, file, indent=4)
+        file.close()
+
 def load_setting(category, setting):
     with open('storage/database/settings.json', 'r') as settings:
         data = json.load(settings)

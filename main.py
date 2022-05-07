@@ -45,7 +45,13 @@ class TwittiaWarriors:
                     self.api.update_status(status='You don\'t have a registered account, please type \"register\" to start playing.', in_reply_to_status_id=tweet.id,
                                        auto_populate_reply_metadata=True)
                 else:
-                    self.api.update_status(status='Account successfully created.', in_reply_to_status_id=tweet.id,
+                    database.register(user)
+
+                    welcome_msg = """
+                        Account successfully created, welcome to Liminar Voyage! Start by typing "profile" to check your profile.
+                    """
+
+                    self.api.update_status(status=welcome_msg, in_reply_to_status_id=tweet.id,
                                            auto_populate_reply_metadata=True)
 
             sleep(1)
@@ -111,4 +117,4 @@ bot = TwittiaWarriors()
 
 while True:
     bot.check_mentions()
-    sleep(30)
+    sleep(10)

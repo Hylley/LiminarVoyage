@@ -136,7 +136,9 @@ def unequip(self, **kwargs):
                                    auto_populate_reply_metadata=True)
         else:
             profile(self, **kwargs)
-    # Debug
+
+
+# Debug
 
 
 def roll(self, **kwargs):
@@ -144,7 +146,8 @@ def roll(self, **kwargs):
 
     text = kwargs['request_tweet_text'].split()
     text.pop(0)
-    dices = int(text[0])
+    if text[0].isnumeric():
+        dices = int(text[0])
 
     rand = randint(1, dices)
 
