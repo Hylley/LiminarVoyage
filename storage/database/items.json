@@ -1,0 +1,46 @@
+{
+  "11037": {
+    "Title": "Simple sword",
+    "Class": "Equipment",
+    "Equip Slots": "Hand",
+
+    "Attributes": {
+      "Attack": 500,
+      "Defense": 0,
+      "Magic Power": 0
+    }
+  },
+
+  "88055": {
+    "Title": "Simple shield",
+    "Class": "Equipment",
+    "Equip Slots": "Hand",
+
+    "Attributes": {
+      "Attack": 0,
+      "Defense": 5,
+      "Magic Power": 0
+    }
+  },
+
+  "28536": {
+    "Title": "Green apple",
+    "Class": "Food",
+
+    "Heal": 100
+  },
+
+  "39573": {
+    "Title": "Apple",
+    "Class": "Food",
+
+    "Heal": 100
+  },
+
+  "10204": {
+    "Title": "Steak",
+    "Class": "Food",
+
+    "Heal": 300
+  }
+}

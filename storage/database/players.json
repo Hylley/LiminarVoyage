@@ -1,0 +1,41 @@
+{
+    "Hyllley2": {
+        "Info": {
+            "Name": "Harlina",
+            "Gender": "Masc"
+        },
+        "Status": {
+            "Health": 6000,
+            "Max Health": 12000,
+            "Attack": 500,
+            "Defense": 0,
+            "Magic Power": 0
+        },
+        "Progression": {
+            "Coins": 999,
+            "Level": 0,
+            "Experience": 0,
+            "Next Level Up Experience": 1000
+        },
+        "Inventory": {
+            "Equipment": {
+                "head": 0,
+                "torso": 0,
+                "hand 1": 11037,
+                "hand 2": 0,
+                "legs": 0
+            },
+            "Backpack": {
+                "11037": 1,
+                "28536": 5,
+                "88055": 1
+            }
+        },
+        "Internal Data": {
+            "Last Battle Datetime": "",
+            "Is Exploring": "0",
+            "Last Exploring Datetime": "2022-04-30 22:47:10+00:00",
+            "Last Exploring Location": ""
+        }
+    }
+}

@@ -1,0 +1,4 @@
+tweepy==4.8.0
+python-dotenv==0.20.0
+schedule==1.1.0
+Pillow==9.1.0
