@@ -1,0 +1,31 @@
+{
+    "common": {
+        "cost": 99,
+        "quantity": 3,
+        "items": "11037 88055 28536 39573 10204"
+    },
+
+    "rare": {
+        "cost": 199,
+        "quantity": 5,
+        "items": ""
+    },
+
+    "epic": {
+        "cost": 299,
+        "quantity": 10,
+        "items": ""
+    },
+
+    "legendary": {
+        "cost": 499,
+        "quantity": 15,
+        "items": ""
+    },
+
+    "liminal": {
+        "cost": 10000,
+        "quantity": 50,
+        "items": ""
+    }
+}

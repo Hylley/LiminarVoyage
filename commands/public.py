@@ -1,8 +1,28 @@
 from random import randint
-import database
-import image_processing
+from scripts import image_processing, utils, game
 
-from time import sleep
+
+def daily(self, **kwargs):
+    player = kwargs['request_player']
+    tweet = kwargs['tweet']
+
+    current_time = tweet.created_at.replace(tzinfo=None)
+    last_register = utils.string_to_date(player.read_internal_data('Last Daily Collect Date'), '')
+
+    print(current_time)
+    print(last_register)
+
+    if last_register:
+        if (current_time - last_register).days < 1:
+            return ['You\'ve already collected your daily chest.']
+
+    chest = game.Chest('common')
+
+    for item in chest.items():
+        player.add_item(item[0], item[1])
+        player.update_internal_data('Last Daily Collect Date', current_time)
+
+    return ['Boa meu mano.']
 
 
 def explore(self, **kwargs):
@@ -14,7 +34,6 @@ def inventory(self, **kwargs):
     player = kwargs['request_player']
     page = 1
 
-    'inventory page 2'
     text = kwargs['request_tweet_text'].split()
     if len(text) > 2:
         text.pop(0)
@@ -23,10 +42,10 @@ def inventory(self, **kwargs):
 
     items = []
 
-    inventory, pages = player.inventory(page, 50)
+    inventory = player.inventory(page, 50)
 
-    for key, value in inventory.items():
-        items.append([f'storage\\images\\items\\{key}.png', value])
+    for key, value in inventory[0].items():
+        items.append([f'storage\\images\\items\\{key}.png', value['qnt']])
 
     image = self.api.media_upload(
         filename=f'{player.id}_inventory_card',
@@ -36,12 +55,10 @@ def inventory(self, **kwargs):
             5,
             20,
             items,
-            [page, pages]
+            [page, inventory[1]]
         ))
-
-    self.api.update_status(status=' ', media_ids=[image.media_id_string],
-                           in_reply_to_status_id=kwargs['request_tweet_id'],
-                           auto_populate_reply_metadata=True)
+    
+    return [' ', [image.media_id_string]]
 
 
 def profile(self, **kwargs):
@@ -89,9 +106,7 @@ def profile(self, **kwargs):
 
     image = self.api.media_upload(filename=f'{player.id}_profile_card', file=profile_card)
 
-    self.api.update_status(status=' ', media_ids=[image.media_id_string],
-                           in_reply_to_status_id=kwargs['request_tweet_id'],
-                           auto_populate_reply_metadata=True)
+    return [f'{player.name}\'s profile:', [image.media_id_string]]
 
 
 def equip(self, **kwargs):
@@ -108,11 +123,9 @@ def equip(self, **kwargs):
 
     if response:
         if isinstance(response, str):
-            self.api.update_status(status=response,
-                                   in_reply_to_status_id=kwargs['request_tweet_id'],
-                                   auto_populate_reply_metadata=True)
+            return [response]
         else:
-            profile(self, **kwargs)
+            return profile(self, **kwargs)
 
 
 def unequip(self, **kwargs):
@@ -124,19 +137,28 @@ def unequip(self, **kwargs):
     text.pop(0)
     complement = text[0]
 
-    if input.isnumeric():
-        response = player.unequip(item_id=int(input))
-    else:
-        response = player.unequip(slot=input, complement=complement)
+    response = player.unequip(slot=input, complement=complement)
 
     if response:
         if isinstance(response, str):
-            self.api.update_status(status=response,
-                                   in_reply_to_status_id=kwargs['request_tweet_id'],
-                                   auto_populate_reply_metadata=True)
+            return [response]
         else:
-            profile(self, **kwargs)
+            return profile(self, **kwargs)
+    else:
+        return None
 
+
+def map(self, **kwargs):
+    player = kwargs['request_player']
+    text = kwargs['request_tweet_text']
+    info = False
+
+    if 'info' in text:
+        info = True
+
+    image = self.api.media_upload(filename=f'{player.id}_map_card_sol', file=image_processing.map_card(info))
+
+    return [' ', [image.media_id_string]]
 
 # Debug
 
@@ -146,21 +168,18 @@ def roll(self, **kwargs):
 
     text = kwargs['request_tweet_text'].split()
     text.pop(0)
-    if text[0].isnumeric():
+
+    if utils.index(text, 0) and text[0].isnumeric():
         dices = int(text[0])
 
-    rand = randint(1, dices)
-
-    self.api.update_status(status=rand,
-                           in_reply_to_status_id=kwargs['request_tweet_id'],
-                           auto_populate_reply_metadata=True)
+    return [randint(1, dices)]
 
 
 def add_item(self, **kwargs):
     kwargs['request_player'].add_item('11037', 1)
 
+    return ['Ok meu brother.']
+
 
 def coins(self, **kwargs):
-    coins = kwargs['request_player'].get_coins()
-    self.api.update_status(status=coins, in_reply_to_status_id=kwargs['request_tweet_id'],
-                           auto_populate_reply_metadata=True)
+    return [kwargs['request_player'].get_coins()]

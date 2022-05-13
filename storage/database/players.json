@@ -24,13 +24,99 @@
                 "hand 2": 0,
                 "legs": 0
             },
+            "Backpack": {
+                "88055": {
+                    "qnt": 9
+                },
+                "11037": {
+                    "qnt": 5
+                },
+                "39573": {
+                    "qnt": 8
+                },
+                "28536": {
+                    "qnt": 4
+                },
+                "10204": {
+                    "qnt": 4
+                }
+            }
+        },
+        "Internal Data": {
+            "Last Battle Datetime": "",
+            "Is Exploring": "0",
+            "Last Daily Collect Date": "2022-05-10 18:39:58",
+            "current location": "liehard"
+        }
+    },
+    "Saraiva8499": {
+        "Info": {
+            "Name": "Saraiva8499"
+        },
+        "Status": {
+            "Health": 1500,
+            "Max Health": 1500,
+            "Attack": 500,
+            "Defense": 0,
+            "Magic Power": 0
+        },
+        "Progression": {
+            "Coins": 0,
+            "Level": 0,
+            "Experience": 0,
+            "Next Level Up Experience": 1000
+        },
+        "Inventory": {
+            "Equipment": {
+                "head": 0,
+                "torso": 0,
+                "hand 1": 0,
+                "hand 2": 0,
+                "legs": 0
+            },
             "Backpack": {}
         },
         "Internal Data": {
             "Last Battle Datetime": "",
             "Is Exploring": "0",
             "Last Exploring Datetime": "",
-            "Last Exploring Location": ""
+            "Last Exploring Location": "",
+            "Last Daily Collect Date": ""
+        }
+    },
+    "Rtrash_": {
+        "Info": {
+            "Name": "Rtrash_"
+        },
+        "Status": {
+            "Health": 1500,
+            "Max Health": 1500,
+            "Attack": 500,
+            "Defense": 0,
+            "Magic Power": 0
+        },
+        "Progression": {
+            "Coins": 0,
+            "Level": 0,
+            "Experience": 0,
+            "Next Level Up Experience": 1000
+        },
+        "Inventory": {
+            "Equipment": {
+                "head": 0,
+                "torso": 0,
+                "hand 1": 0,
+                "hand 2": 0,
+                "legs": 0
+            },
+            "Backpack": {}
+        },
+        "Internal Data": {
+            "Last Battle Datetime": "",
+            "Is Exploring": "0",
+            "Last Exploring Datetime": "",
+            "Last Exploring Location": "",
+            "Last Daily Collect Date": ""
         }
     }
 }

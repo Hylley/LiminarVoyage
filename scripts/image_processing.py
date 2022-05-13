@@ -126,7 +126,35 @@ def inventory_card(items, collums, lines, spacing, items_list, page):
 
     return file
 
-# Utils
+
+def map_card(info):
+    from datetime import datetime
+
+    hour = datetime.now().hour
+    complement = 'day'
+
+    if 3 < hour < 7:
+        complement = 'sunset'
+    elif 6 < hour < 15:
+        complement = 'day'
+    elif 14 < hour < 18:
+        complement = 'sunset'
+    else:
+        complement = 'night'
+
+    background = Image.open(f'{main_path}map\\world\\time\\{complement}.png')
+
+    if info:
+        info = Image.open(f'{main_path}map\\world\\nametags.png').convert('RGBA')
+        background.paste(info, (0, 0), info)
+
+    file = BytesIO()
+    background.save(file, 'PNG')
+    file.seek(0)
+
+    return file
+# Others
+
 
 def add_margin(pil_img, top, right, bottom, left, color):
     width, height = pil_img.size

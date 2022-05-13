@@ -1,0 +1,12 @@
+{
+  "133037": {
+    "name": "Green Slime",
+    "description": "It's a basic monster, characterized by two slimy eyes and a gooey gaping maw. Slimes are known for their voracious appetites, and their ability to eat anything that can be absorbed into their squishy membranes.\nThough not all slimes are desirable for consumption, some species of slime are sought after for the making soups, sauces, and pizzas.",
+    "health": 1200,
+
+    "damage": 250,
+    "defense": 0,
+
+    "run probability": 30
+  }
+}

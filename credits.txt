@@ -4,3 +4,7 @@ Pixel art:
 
 Icons:
 	https://game-icons.net/
+
+Map:
+	@WargrooveGame
+	https://freesvg.org/simple-wind-rose

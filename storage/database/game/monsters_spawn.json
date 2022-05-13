@@ -1,0 +1,85 @@
+{
+  "Liehard": {
+    "Day": {
+
+    },
+
+    "Noon": {
+
+    },
+
+    "Night": {
+
+    }
+  },
+
+  "Lacerny": {
+    "Day": {
+
+    },
+
+    "Noon": {
+
+    },
+
+    "Night": {
+
+    }
+  },
+
+  "Senju": {
+    "Day": {
+
+    },
+
+    "Noon": {
+
+    },
+
+    "Night": {
+
+    }
+  },
+
+  "Andorran": {
+    "Day": {
+
+    },
+
+    "Noon": {
+
+    },
+
+    "Night": {
+
+    }
+  },
+
+  "Musk": {
+    "Day": {
+      "133037": 60
+    },
+
+    "Noon": {
+
+    },
+
+    "Night": {
+
+    }
+  },
+
+  "Lyes": {
+    "Day": {
+
+    },
+
+    "Noon": {
+
+    },
+
+    "Night": {
+
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import json
 from math import ceil
-from database import search_for_item
+from scripts.database import search_for_item
 
 
 class Player:
@@ -63,9 +63,9 @@ class Player:
 
                     current_index += 1
 
-                return items, pages
+                return [items, pages]
             else:
-                return backpack, 1
+                return [backpack, 1]
 
     def equipment(self):
         return self.player_data['Inventory']['Equipment']
@@ -80,13 +80,13 @@ class Player:
 
         if item_id in items:
             if item_id in inventory:
-                if inventory[item_id] + qnt > 0:
-                    inventory[item_id] += qnt
+                if inventory[item_id]['qnt'] + qnt > 0:
+                    inventory[item_id]['qnt'] += qnt
                 else:
                     del inventory[item_id]
             else:
                 if qnt > 0:
-                    inventory[item_id] = qnt
+                    inventory[item_id] = {'qnt': qnt}
                 else:
                     pass
 
@@ -102,7 +102,7 @@ class Player:
         inventory, pages = self.inventory()
         return str(item_id) in inventory
 
-    # Gameplay functions
+    # Equipment system
 
     def equip(self, item_id, slot, rest):
         item = search_for_item(str(item_id))
@@ -138,6 +138,8 @@ class Player:
         return True
 
     def unequip(self, item_id, slot, complement):
+        item_id = int(item_id)
+
         equipment_slots = self.player_data['Inventory']['Equipment']
         unequipped = False
 
@@ -185,9 +187,6 @@ class Player:
             equipment_slots[slot] = 0
         self.update_player_data()
         return True
-
-
-    # def unequip(self, item_id, slot, rest):
 
     def is_equipped(self, item_id, slot):
         if self.player_data['Inventory']['Equipment'][slot] == item_id:
@@ -237,3 +236,20 @@ def player_exists(username):
         players_data.close()
 
     return username in players
+
+
+def register(user_id):
+    with open('storage/database/player_model.json', 'r') as model:
+        starter_data = json.load(model)
+        model.close()
+
+    with open('storage/database/players.json', 'r') as file:
+        players_list = json.load(file)
+        file.close()
+
+    players_list[user_id] = starter_data['id']
+    players_list[user_id]['Info']['Name'] = user_id
+
+    with open('storage/database/players.json', 'w') as file:
+        json.dump(players_list, file, indent=4)
+        file.close()

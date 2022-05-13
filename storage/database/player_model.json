@@ -4,8 +4,8 @@
             "Name": ""
         },
         "Status": {
-            "Health": 12000,
-            "Max Health": 12000,
+            "Health": 1500,
+            "Max Health": 1500,
             "Attack": 500,
             "Defense": 0,
             "Magic Power": 0
@@ -30,7 +30,8 @@
             "Last Battle Datetime": "",
             "Is Exploring": "0",
             "Last Exploring Datetime": "",
-            "Last Exploring Location": ""
+            "Last Exploring Location": "",
+            "Last Daily Collect Date": ""
         }
     }
 }
