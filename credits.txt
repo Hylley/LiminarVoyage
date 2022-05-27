@@ -1,10 +1,14 @@
-Pixel art:
-	https://henrysoftware.itch.io/pixel-food
-	https://alexs-assets.itch.io/16x16-rpg-item-pack
+Graphics:
+	Pixel art:
+		https://henrysoftware.itch.io/pixel-food
+		https://alexs-assets.itch.io/16x16-rpg-item-pack
 
-Icons:
-	https://game-icons.net/
+	Icons:
+		https://game-icons.net/
 
-Map:
-	@WargrooveGame
-	https://freesvg.org/simple-wind-rose
+	Map:
+		@WargrooveGame
+		https://freesvg.org/simple-wind-rose
+
+	Locations:
+		https://ansimuz.itch.io/cyberpunk-street-environment

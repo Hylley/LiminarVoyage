@@ -1,7 +1,8 @@
 {
     "id": {
         "Info": {
-            "Name": ""
+            "Name": "",
+            "location": "west_liehard"
         },
         "Status": {
             "Health": 1500,
@@ -28,7 +29,7 @@
         },
         "Internal Data": {
             "Last Battle Datetime": "",
-            "Is Exploring": "0",
+            "Is Exploring": 0,
             "Last Exploring Datetime": "",
             "Last Exploring Location": "",
             "Last Daily Collect Date": ""

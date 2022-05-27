@@ -22,7 +22,9 @@ def daily(self, **kwargs):
         player.add_item(item[0], item[1])
         player.update_internal_data('Last Daily Collect Date', current_time)
 
-    return ['Boa meu mano.']
+    return {
+        'text': 'Boa meu mano.'
+    }
 
 
 def explore(self, **kwargs):
@@ -58,7 +60,10 @@ def inventory(self, **kwargs):
             [page, inventory[1]]
         ))
     
-    return [' ', [image.media_id_string]]
+    return {
+        'text': ' ',
+        'images': [image.media_id_string]
+    }
 
 
 def profile(self, **kwargs):
@@ -106,7 +111,10 @@ def profile(self, **kwargs):
 
     image = self.api.media_upload(filename=f'{player.id}_profile_card', file=profile_card)
 
-    return [f'{player.name}\'s profile:', [image.media_id_string]]
+    return {
+        'text': f'{player.name}\'s profile:',
+        'images': [image.media_id_string]
+    }
 
 
 def equip(self, **kwargs):
@@ -123,7 +131,9 @@ def equip(self, **kwargs):
 
     if response:
         if isinstance(response, str):
-            return [response]
+            return {
+                'text': response
+            }
         else:
             return profile(self, **kwargs)
 
@@ -141,7 +151,9 @@ def unequip(self, **kwargs):
 
     if response:
         if isinstance(response, str):
-            return [response]
+            return {
+                'text': response
+            }
         else:
             return profile(self, **kwargs)
     else:
@@ -158,7 +170,10 @@ def map(self, **kwargs):
 
     image = self.api.media_upload(filename=f'{player.id}_map_card_sol', file=image_processing.map_card(info))
 
-    return [' ', [image.media_id_string]]
+    return {
+        'text': ' ',
+        'images': [image.media_id_string]
+    }
 
 # Debug
 
@@ -172,14 +187,20 @@ def roll(self, **kwargs):
     if utils.index(text, 0) and text[0].isnumeric():
         dices = int(text[0])
 
-    return [randint(1, dices)]
+    return {
+        'text': str(randint(1, dices))
+    }
 
 
 def add_item(self, **kwargs):
     kwargs['request_player'].add_item('11037', 1)
 
-    return ['Ok meu brother.']
+    return {
+        'text': "Ok meu brother."
+    }
 
 
 def coins(self, **kwargs):
-    return [kwargs['request_player'].get_coins()]
+    return {
+        'text': str(kwargs['request_player'].get_coins())
+    }

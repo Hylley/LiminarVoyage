@@ -79,8 +79,7 @@ class LiminarVoyage:
 
         if source == 'mention':
             try:
-                text = 'Something went wrong. But don\'t worry, it wasn\'t your fault.'
-                image_ids = None
+                default = 'Something went wrong. But don\'t worry, it wasn\'t your fault.'
 
                 response = getattr(public, split_text[0])(self,
                                                           request_tweet_id=request_tweet_id,
@@ -88,11 +87,7 @@ class LiminarVoyage:
                                                           request_player=request_player,
                                                           tweet=tweet)
 
-                if response:
-                    text = utils.index(response, 0) or text
-                    image_ids = utils.index(response, 1) or image_ids
-
-                self.api.update_status(status=text, media_ids=image_ids,
+                self.api.update_status(status=response['text'] or default[0], media_ids=response['images'] or None,
                                        in_reply_to_status_id=request_tweet_id,
                                        auto_populate_reply_metadata=True)
             except:

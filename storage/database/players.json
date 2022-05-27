@@ -1,7 +1,8 @@
 {
     "Hyllley2": {
         "Info": {
-            "Name": "Hyllley2"
+            "Name": "Hyllley2",
+            "location": "west_liehard"
         },
         "Status": {
             "Health": 12000,
@@ -44,7 +45,7 @@
         },
         "Internal Data": {
             "Last Battle Datetime": "",
-            "Is Exploring": "0",
+            "Is Exploring": 0,
             "Last Daily Collect Date": "2022-05-10 18:39:58",
             "current location": "liehard"
         }
@@ -78,7 +79,7 @@
         },
         "Internal Data": {
             "Last Battle Datetime": "",
-            "Is Exploring": "0",
+            "Is Exploring": 0,
             "Last Exploring Datetime": "",
             "Last Exploring Location": "",
             "Last Daily Collect Date": ""
@@ -113,7 +114,7 @@
         },
         "Internal Data": {
             "Last Battle Datetime": "",
-            "Is Exploring": "0",
+            "Is Exploring": 0,
             "Last Exploring Datetime": "",
             "Last Exploring Location": "",
             "Last Daily Collect Date": ""
