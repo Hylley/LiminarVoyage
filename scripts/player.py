@@ -1,18 +1,58 @@
-import json
-from math import ceil
-from scripts.database import search_for_item
+import sqlite3
+
+connection = sqlite3.connect('../database/player_side.db')
+db = connection.cursor()
 
 
 class Player:
     def __init__(self, user):
-        with open('storage/database/players.json') as players_data:
-            players = json.load(players_data)
-            players_data.close()
+        self.screen_name = user.lower()
 
-        self.id = user
-        self.player_data = players[user]
-        self.name = self.player_data['Info']['Name']
+        # Adjusting all player variables from database.
 
+        player_raw = db.execute(f'SELECT * FROM players WHERE name = ?', [self.screen_name]).fetchone()
+
+        self.player = {
+            'id': player_raw[0],
+            'name': player_raw[1],
+            'grenag': player_raw[2],
+            'level': player_raw[3],
+            'exp': player_raw[4],
+            'health': player_raw[5]
+        }
+
+        status_raw = db.execute(f'SELECT * FROM status WHERE player_id = ?', [self.player['id']]).fetchone()
+
+        self.status = {
+            'max_health': status_raw[1],
+            'attack': status_raw[2],
+            'defense': status_raw[3],
+            'magic_power': status_raw[4]
+        }
+
+    def inventory(self, items_per_page=0):
+        inventory_connection = sqlite3.connect('../database/inventory.db')
+        inventory_cursor = inventory_connection.cursor()
+
+        raw = inventory_cursor.execute(f'SELECT * FROM {self.screen_name} ').fetchall()
+        inventory_connection.close()
+        result = []
+
+        for row in raw:
+            result.append(
+                {
+                    "id": row[0],
+                    'quantity': row[1]
+                }
+            )
+
+        if items_per_page != 0:
+            chunks = [result[x:x + items_per_page] for x in range(0, len(result), items_per_page)]
+            return chunks
+
+        return result
+
+    """
     def api_object(self, api):
         return api.get_user(screen_name=self.id)
 
@@ -228,8 +268,20 @@ class Player:
 
     def get_coins(self):
         return self.player_data['Status']['Coins']
+"""
 
 
+def exists(screen_name):
+    """
+        The 'exists' function check if the player with informed screen name exist.
+    """
+
+    return db.execute('SELECT EXISTS (SELECT 1 FROM players WHERE name= ? LIMIT 1)', [screen_name]).fetchone()[0]
+
+
+connection.close()
+
+"""
 def player_exists(username):
     with open('storage/database/players.json') as players_data:
         players = json.load(players_data)
@@ -253,3 +305,4 @@ def register(user_id):
     with open('storage/database/players.json', 'w') as file:
         json.dump(players_list, file, indent=4)
         file.close()
+"""

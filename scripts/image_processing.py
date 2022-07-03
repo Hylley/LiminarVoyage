@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
+import database
 import requests
 from io import BytesIO
 
@@ -74,7 +75,7 @@ def profile_card(image, name, health, max_health, progress, values, bio, player_
     return file
 
 
-def inventory_card(items, collums, lines, spacing, items_list, page):
+def inventory_card(collums, lines, spacing, items_list, page):
     background = Image.open(f'{main_path}inventory\\inventory_background.png')
     slot_path = f'{main_path}inventory\\inventory_slot.png'
 
@@ -92,33 +93,34 @@ def inventory_card(items, collums, lines, spacing, items_list, page):
 
     ImageDraw.Draw(background).text(
         (739, 817),
-        f'Page {page[0]}/{page[1]}',
+        f'Page {page[0]} of {page[1]}',
         font=page_view_font)
 
-    if collums % 2 == 0:  # If number is even.
-        for i in range(lines):
-            pos_x = (((collums * spacing) + (collums * slot_size)) - unit)/1.5
+    if not collums % 2 == 0: return None  # If number is even, return.
 
-            for i in range(collums):
-                pos_x -= unit
+    for i in range(lines):
+        pos_x = (((collums * spacing) + (collums * slot_size)) - unit)/1.5
 
-                slot = Image.open(slot_path)
-                position = center[0] - int(pos_x), pos_y
+        for i in range(collums):
+            pos_x -= unit
 
-                background.paste(slot,
-                                 position,
-                                 slot)
+            slot = Image.open(slot_path)
+            position = center[0] - int(pos_x), pos_y
 
-                slots.append(position)
+            background.paste(slot,
+                             position,
+                             slot)
 
-            pos_y += unit
+            slots.append(position)
 
-        for i in range(len(slots)):
-            if i < len(items_list):
-                item = Image.open(items_list[i][0]).resize(item_icon_size, Image.NEAREST).convert("RGBA")
-                position = (int(slots[i][0] + slot_size/18), int(slots[i][1] + slot_size/18))
-                background.paste(item, position, item)
-                ImageDraw.Draw(background).text((position[0] + quantity_relative_position[0], position[1] + quantity_relative_position[1]), str(items_list[i][1]), font=quantity_font)
+        pos_y += unit
+
+    for i in range(len(slots)):
+        if i < len(items_list):
+            item = Image.open(f'storage\\images\\items\\{items_list[i]["id"]}.png').resize(item_icon_size, Image.NEAREST).convert("RGBA")
+            position = (int(slots[i][0] + slot_size/18), int(slots[i][1] + slot_size/18))
+            background.paste(item, position, item)
+            ImageDraw.Draw(background).text((position[0] + quantity_relative_position[0], position[1] + quantity_relative_position[1]), str(items_list[i]['quantity']), font=quantity_font)
 
     file = BytesIO()
     background.save(file, 'PNG')

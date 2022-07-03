@@ -38,26 +38,19 @@ def inventory(self, **kwargs):
 
     text = kwargs['request_tweet_text'].split()
     if len(text) > 2:
-        text.pop(0)
-        text.pop(0)
-        page = int(text[0])
+        page = int(text[2])
 
-    items = []
-
-    inventory = player.inventory(page, 50)
-
-    for key, value in inventory[0].items():
-        items.append([f'storage\\images\\items\\{key}.png', value['qnt']])
+    inventory = player.inventory(50)
+    items, max_pages = inventory[page-1], len(inventory)
 
     image = self.api.media_upload(
         filename=f'{player.id}_inventory_card',
         file=image_processing.inventory_card(
-            0,
             10,
             5,
             20,
             items,
-            [page, inventory[1]]
+            [page, max_pages]
         ))
     
     return {

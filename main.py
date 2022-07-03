@@ -27,7 +27,7 @@ class LiminarVoyage:
 
     def check_mentions(self):
         mentions_list = self.api.mentions_timeline(count=50,
-                                                   since_id=database.load_setting('system', 'last_mention_id'))
+                                                   since_id=database.private('last_mention_id'))
         if not mentions_list:
             return
 
@@ -36,7 +36,7 @@ class LiminarVoyage:
 
             text = utils.filter_text(tweet.text)
 
-            if not plr.player_exists(user):
+            if not plr.exists(user):
                 return
 
             player = plr.Player(user)
@@ -99,8 +99,6 @@ class LiminarVoyage:
                 command_function(self, request_tweet_id, request_tweet_text, request_player, tweet)
             except:
                 return
-
-    # Gameplay
 
 
 bot = LiminarVoyage()
