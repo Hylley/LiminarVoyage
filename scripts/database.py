@@ -1,19 +1,12 @@
-"""
-    DATABASE:
-
-    The game database is mainly divided into "player side" data and "game side" data.
-This code manages the "game side" data.
-"""
-
 import sqlite3
-from player import Player
+#from player import Player
 
-path = '../database'    # All the database relatable files have to be in there.
 
-connection = sqlite3.connect(f'{path}/game_side.db')    # Connect to game side database file.
-db = connection.cursor()
+def connect(file):
+    return sqlite3.connect(f'database/{file}').cursor()
 
-player = Player('Hyllley')
+
+#player = Player('Hyllley')
 
 """
     GAME RELATABLE FUNCTIONS:
@@ -31,12 +24,16 @@ def general_item(item_id):
         (Even if it had, the 'items' table will have preference.)
     """
 
-    return db.execute(
+    db = connect('game_side.db')
+
+    result = db.execute(
         f'SELECT * FROM items WHERE id = {item_id}'
     ).fetchone() or db.execute(
         f'SELECT * FROM weapons WHERE id = {item_id}'
     ).fetchone() or None
 
+    db.close()
+    return result
 
 """
     INTERNAL RELATABLE FUNCTIONS:
@@ -45,17 +42,30 @@ def general_item(item_id):
 """
 
 
-def private(key):
+def private(key, value=None):
     """
         The 'private' function access the 'private_data table, where is stored all the bot
         important data.
 
-        If no found, return 'None'.
+        If the value attribule is filled, then the respective key value of the table will be
+        updated. If not, then the function will return the current value. A simple but dinamic
+        read/update one-in-the-same function.
+
+        If the key not found, return 'None'.
     """
 
-    return db.execute(
-        f'SELECT value FROM private_data WHERE key = ?', [key]
-    ).fetchone() or None
+    db = connect('game_side.db')
 
+    if not value:
+        result = db.execute(
+            f'SELECT value FROM private_data WHERE key = ?', [key]
+        ).fetchone()[0] or None
 
-db.close()
+        db.close()
+        return result
+
+    db.execute(
+        f'UPDATE private_data SET value = ? WHERE key = ?', [value, key]
+    )
+    >>db.commit()<<
+    db.close()

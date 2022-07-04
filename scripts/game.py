@@ -1,4 +1,4 @@
-from random import randrange, shuffle
+"""from random import randrange, shuffle
 from scripts.database import open_read
 from scripts.utils import refactor
 
@@ -27,3 +27,4 @@ class Chest:
             result.append([items_list[i], quantities[i]])
 
         return result
+"""

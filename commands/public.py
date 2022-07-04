@@ -1,5 +1,5 @@
 from random import randint
-from scripts import image_processing, utils, game
+from scripts import image_processing, utils
 
 
 def daily(self, **kwargs):
@@ -16,7 +16,7 @@ def daily(self, **kwargs):
         if (current_time - last_register).days < 1:
             return ['You\'ve already collected your daily chest.']
 
-    chest = game.Chest('common')
+    """chest = game.Chest('common')
 
     for item in chest.items():
         player.add_item(item[0], item[1])
@@ -24,7 +24,7 @@ def daily(self, **kwargs):
 
     return {
         'text': 'Boa meu mano.'
-    }
+    }"""
 
 
 def explore(self, **kwargs):
@@ -44,7 +44,7 @@ def inventory(self, **kwargs):
     items, max_pages = inventory[page-1], len(inventory)
 
     image = self.api.media_upload(
-        filename=f'{player.id}_inventory_card',
+        filename=f'{player.screen_name}_inventory_card',
         file=image_processing.inventory_card(
             10,
             5,

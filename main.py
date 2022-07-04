@@ -4,7 +4,7 @@ from time import sleep
 from dotenv import load_dotenv
 
 from commands import private, public
-from scripts import player as plr, database, utils
+from scripts import player, database, utils
 
 
 class LiminarVoyage:
@@ -32,19 +32,17 @@ class LiminarVoyage:
             return
 
         for tweet in mentions_list:
-            user = tweet.author.screen_name
+            user = tweet.author.screen_name.lower()
 
-            text = utils.filter_text(tweet.text)
-
-            if not plr.exists(user):
+            if not player.exists(user):
                 return
 
-            player = plr.Player(user)
+            plr = player.Player(user)
 
-            self.execute_command(tweet.id, text, player, tweet, 'mention')
+            self.execute_command(tweet, plr, 'mention')
             sleep(1)
 
-        database.set_setting('last_mention_id', mentions_list[0].id)
+        database.private('last_mention_id', mentions_list[0].id)
 
     def check_dm(self):
         dm_list = self.api.get_direct_messages(count='50')
@@ -60,45 +58,34 @@ class LiminarVoyage:
 
         print(result)
 
-    def execute_command(self, request_tweet_id, request_tweet_text, request_player, tweet, source):
-        print(request_tweet_text)
+    def execute_command(self, tweet, request_player, source):
+        text = utils.filter_text(tweet.text)
+        split_text = text.split()
 
-        if int(request_player.read_internal_data('Is Exploring')) == 1:
-            current_time = tweet.created_at.replace(tzinfo=None)
-            last_registered = utils.string_to_date(request_player.read_internal_data('Last Exploring Datetime'))
-
-            delta_date = current_time - last_registered
-
-            exploring_seconds = delta_date.total_seconds()
-
-            #
-
-            request_player.update_internal_data('Is Exploring', 0)
-
-        split_text = request_tweet_text.split()
+        print(text)
 
         if source == 'mention':
-            try:
-                default = 'Something went wrong. But don\'t worry, it wasn\'t your fault.'
+            #try:
+            default = 'Something went wrong. But don\'t worry, it wasn\'t your fault.'
+            response = getattr(public, split_text[0])(self,
+                                                      request_tweet_id=tweet.id,
+                                                      request_tweet_text=text.lower(),
+                                                      request_player=request_player,
+                                                      tweet=tweet)
 
-                response = getattr(public, split_text[0])(self,
-                                                          request_tweet_id=request_tweet_id,
-                                                          request_tweet_text=request_tweet_text.lower(),
-                                                          request_player=request_player,
-                                                          tweet=tweet)
-
-                self.api.update_status(status=response['text'] or default[0], media_ids=response['images'] or None,
-                                       in_reply_to_status_id=request_tweet_id,
-                                       auto_populate_reply_metadata=True)
-            except:
-                return
+            self.api.update_status(status=response['text'] or default, media_ids=response['images'] or None,
+                                   in_reply_to_status_id=tweet.id,
+                                   auto_populate_reply_metadata=True)
+            #except:
+                #return
 
         elif source == 'direct':
-            try:
-                command_function = getattr(private, split_text[0])
-                command_function(self, request_tweet_id, request_tweet_text, request_player, tweet)
-            except:
-                return
+            return
+            #try:
+            #    command_function = getattr(private, split_text[0])
+            #    command_function(self, request_tweet_id, request_tweet_text, request_player, tweet)
+            #except:
+            #    return
 
 
 bot = LiminarVoyage()

@@ -1,12 +1,10 @@
-import sqlite3
-
-connection = sqlite3.connect('../database/player_side.db')
-db = connection.cursor()
+from . import database
 
 
 class Player:
     def __init__(self, user):
-        self.screen_name = user.lower()
+        self.screen_name = user
+        db = database.connect('player_side.db')
 
         # Adjusting all player variables from database.
 
@@ -31,11 +29,10 @@ class Player:
         }
 
     def inventory(self, items_per_page=0):
-        inventory_connection = sqlite3.connect('../database/inventory.db')
-        inventory_cursor = inventory_connection.cursor()
+        inventory = database.connect('inventory.db')
 
-        raw = inventory_cursor.execute(f'SELECT * FROM {self.screen_name} ').fetchall()
-        inventory_connection.close()
+        raw = inventory.execute(f'SELECT * FROM {self.screen_name}').fetchall()
+        inventory.close()
         result = []
 
         for row in raw:
@@ -275,11 +272,13 @@ def exists(screen_name):
     """
         The 'exists' function check if the player with informed screen name exist.
     """
+    db = database.connect('player_side.db')
 
-    return db.execute('SELECT EXISTS (SELECT 1 FROM players WHERE name= ? LIMIT 1)', [screen_name]).fetchone()[0]
+    result = db.execute('SELECT EXISTS (SELECT 1 FROM players WHERE name= ? LIMIT 1)', [screen_name.lower()]).fetchone()[0]
+    db.close()
 
+    return result
 
-connection.close()
 
 """
 def player_exists(username):
