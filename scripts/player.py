@@ -4,35 +4,80 @@ from . import database
 class Player:
     def __init__(self, user):
         self.screen_name = user
-        db = database.connect('player_side.db')
+        db, con = database.connect('player_side.db')
 
         # Adjusting all player variables from database.
 
-        player_raw = db.execute(f'SELECT * FROM players WHERE name = ?', [self.screen_name]).fetchone()
+        raw = db.execute(f'SELECT * FROM players WHERE name = ?', [self.screen_name]).fetchone()
 
         self.player = {
-            'id': player_raw[0],
-            'name': player_raw[1],
-            'grenag': player_raw[2],
-            'level': player_raw[3],
-            'exp': player_raw[4],
-            'health': player_raw[5]
+            'id': raw[0],
+            'name': raw[1],
+            'grenag': raw[2],
+            'level': raw[3],
+            'exp': raw[4],
+            'health': raw[5]
         }
 
-        status_raw = db.execute(f'SELECT * FROM status WHERE player_id = ?', [self.player['id']]).fetchone()
+        raw = db.execute(f'SELECT * FROM status WHERE player_id = ?', [self.player['id']]).fetchone()
 
         self.status = {
-            'max_health': status_raw[1],
-            'attack': status_raw[2],
-            'defense': status_raw[3],
-            'magic_power': status_raw[4]
+            'attack': raw[1],
+            'defense': raw[2],
+            'magic_power': raw[3]
         }
 
+        raw = db.execute(f'SELECT * FROM internal_data WHERE player_id = ?', [self.player['id']]).fetchone()
+
+        self.internal = {
+            'max_health': raw[3],
+            'next_level_up_exp': raw[4]
+        }
+
+        con.close()
+
+    def api_object(self, api):
+        return api.get_user(screen_name=self.screen_name)
+
+    """
+        PLAYER STATUS:
+
+            The player status area deals with the player status system. It includes
+        health, power values, internal data etc.
+    """
+
+    def boost(self, attack=0, defense=0, magic_power=0):
+        db, con = database.connect('player_side.db')
+
+        for key, value in {'attack': attack, 'defense': defense, 'magic_power': magic_power}:
+            if value != 0:
+                current = db.execute(f'SELECT {key} FROM equipment WHERE player_id = ?', [self.player['id']]).fetchone()[0]
+                db.execute(f'UPDATE status SET {key} = ? WHERE player_id = ? ', [current + value, self.player['id']])
+
+        con.commit()
+        con.close()
+
+    def nerf(self, attack=0, defense=0, magic_power=0):
+        self.boost(-attack, -defense, -magic_power)
+
+    """
+        PLAYER INVENTORY:
+        
+            The player inventory area deals with the inventory system as well as the
+        equipment logic. Functions that return the inventory, equip an armor equipment,
+        add/remove an item, etc. are located here.
+    """
+
     def inventory(self, items_per_page=0):
-        inventory = database.connect('inventory.db')
+        """
+                The inventory function search for the respective player inventory table in
+            'inventory.db' and convert all the data to a more friendly readable dict variable.
+        """
+
+        inventory, con = database.connect('inventory.db')
 
         raw = inventory.execute(f'SELECT * FROM {self.screen_name}').fetchall()
-        inventory.close()
+        con.close()
         result = []
 
         for row in raw:
@@ -49,10 +94,87 @@ class Player:
 
         return result
 
-    """
-    def api_object(self, api):
-        return api.get_user(screen_name=self.id)
+    def add(self, item_id, quantity, create_if_not_exist=True):
+        inventory, con = database.connect('inventory.db')
 
+        if inventory.execute(f'SELECT EXISTS(SELECT * FROM {self.screen_name} WHERE item_id = ? LIMIT 1)', [item_id]).fetchone()[0]:
+            current = inventory.execute(f'SELECT quantity FROM {self.screen_name} WHERE item_id = ?', [item_id]).fetchone()[0]
+
+            if current + quantity > 0 and quantity != 0:
+                inventory.execute(f'UPDATE {self.screen_name} SET quantity = ? WHERE item_id = ?', [current + quantity, item_id])
+            else:
+                inventory.execute(f'DELETE FROM {self.screen_name} WHERE item_id = ?', [item_id])
+
+            con.commit()
+            con.close()
+            return
+
+        if create_if_not_exist:
+            inventory.execute(f'INSERT INTO {self.screen_name} VALUES(?, ?)', [item_id, quantity])
+
+        con.commit()
+        con.close()
+
+    def subtract(self, item_id, quantity = 0):
+        self.add(item_id, -quantity, False)
+
+    def has(self, item_id):
+        """
+            This functions checks if the player have the informed item id in inventory.
+        """
+
+        inventory, con = database.connect('inventory.db')
+
+        result = inventory.execute(f'SELECT EXISTS(SELECT * FROM {self.screen_name} WHERE item_id = ? LIMIT 1)', [item_id]).fetchone()[0]
+
+        con.commit()
+        con.close()
+
+        return result
+
+    def equipment(self):
+        """
+                This function search for the current player armor equipment in 'player_side.db'
+            and convert to a more friendly readable dict variable. If no equipped armor is found,
+            the default value is 0.
+        """
+
+        equipment, con = database.connect('player_side.db')
+        raw = equipment.execute(f'SELECT * FROM equipment WHERE player_id = ?', [self.player['id']]).fetchone()
+        con.close()
+
+        return {
+            'head': raw[1] or 0,
+            'torso': raw[2] or 0,
+            'hand_1': raw[3] or 0,
+            'hand_2': raw[4] or 0,
+            'legs': raw[5] or 0,
+        }
+
+    def equip(self, armor_id, slot):
+        if not self.has(armor_id): return 'The given ID is not present in your inventory.'
+        if not database.equipment(armor_id): return 'The given ID is not an valid equippable item.'
+
+        armor = database.equipment(armor_id)
+
+        if not armor[3] == slot: return 'Unable to insert the given item to the respective location.'
+
+        equipment, con = database.connect('player_side.db')
+
+        equipment.execute(f'UPDATE equipment SET ? = ? WHERE player_id = ?', [slot, armor_id, self.screen_name])
+
+        self.boost(
+            attack=0,
+            defense=0,
+            magic_power=0
+        )
+
+        self.subtract(armor_id, 1)
+
+        con.commit()
+        con.close()
+
+    """
     # Player status modifiers
 
     def take_damage(self, damage):
@@ -72,72 +194,6 @@ class Player:
 
     def nerf_attributes(self, attack=0, deffense=0, magic=0):
         self.boost_attributes(-attack, -deffense, -magic)
-
-    # Inventory manipulation
-
-    def inventory(self, page=1, items_per_page=0):
-        backpack = self.player_data['Inventory']['Backpack']
-        keys = list(backpack)
-
-        if items_per_page == 0:
-            return backpack, 1
-
-        pages = int(ceil(len(backpack)/items_per_page))
-
-        if pages == 1:
-            return backpack, 1
-
-        else:
-            if items_per_page < len(backpack):
-                current_index = items_per_page * (page - 1)
-                end_index = current_index + items_per_page
-
-                items = {}
-
-                while current_index < end_index:
-                    if current_index < len(backpack):
-                        items[keys[current_index]] = backpack[keys[current_index]]
-
-                    current_index += 1
-
-                return [items, pages]
-            else:
-                return [backpack, 1]
-
-    def equipment(self):
-        return self.player_data['Inventory']['Equipment']
-
-    def add_item(self, item_id, qnt=1):
-        item_id = str(item_id)
-        inventory, pages = self.inventory()
-
-        with open('storage/database/items.json', 'r') as file:
-            items = json.load(file)
-            file.close()
-
-        if item_id in items:
-            if item_id in inventory:
-                if inventory[item_id]['qnt'] + qnt > 0:
-                    inventory[item_id]['qnt'] += qnt
-                else:
-                    del inventory[item_id]
-            else:
-                if qnt > 0:
-                    inventory[item_id] = {'qnt': qnt}
-                else:
-                    pass
-
-            self.update_player_data()
-
-    def subtract_item(self, item_id, qnt):
-        self.add_item(item_id, -qnt)
-
-    def remove_item(self):
-        pass
-
-    def has_item(self, item_id):
-        inventory, pages = self.inventory()
-        return str(item_id) in inventory
 
     # Equipment system
 
@@ -272,7 +328,7 @@ def exists(screen_name):
     """
         The 'exists' function check if the player with informed screen name exist.
     """
-    db = database.connect('player_side.db')
+    db = database.connect('player_side.db')[0]
 
     result = db.execute('SELECT EXISTS (SELECT 1 FROM players WHERE name= ? LIMIT 1)', [screen_name.lower()]).fetchone()[0]
     db.close()

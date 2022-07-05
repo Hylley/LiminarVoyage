@@ -28,8 +28,11 @@ class LiminarVoyage:
     def check_mentions(self):
         mentions_list = self.api.mentions_timeline(count=50,
                                                    since_id=database.private('last_mention_id'))
+
         if not mentions_list:
             return
+
+        mentions_list.reverse()
 
         for tweet in mentions_list:
             user = tweet.author.screen_name.lower()
@@ -40,9 +43,8 @@ class LiminarVoyage:
             plr = player.Player(user)
 
             self.execute_command(tweet, plr, 'mention')
+            database.private('last_mention_id', tweet.id)
             sleep(1)
-
-        database.private('last_mention_id', mentions_list[0].id)
 
     def check_dm(self):
         dm_list = self.api.get_direct_messages(count='50')
@@ -65,26 +67,29 @@ class LiminarVoyage:
         print(text)
 
         if source == 'mention':
-            #try:
-            default = 'Something went wrong. But don\'t worry, it wasn\'t your fault.'
-            response = getattr(public, split_text[0])(self,
-                                                      request_tweet_id=tweet.id,
-                                                      request_tweet_text=text.lower(),
-                                                      request_player=request_player,
-                                                      tweet=tweet)
+            command = split_text[0]
 
-            self.api.update_status(status=response['text'] or default, media_ids=response['images'] or None,
-                                   in_reply_to_status_id=tweet.id,
-                                   auto_populate_reply_metadata=True)
-            #except:
-                #return
+            if hasattr(public, command):
+                default = 'Something went wrong. But don\'t worry, it wasn\'t your fault.'
+
+                response = getattr(public, command)(self,
+                                   request_tweet_id=tweet.id,
+                                   request_tweet_text=text.lower(),
+                                   request_player=request_player,
+                                   tweet=tweet)
+
+                self.api.update_status(status=response['text'] or default, media_ids=response['images'] or None,
+                                       in_reply_to_status_id=tweet.id,
+                                       auto_populate_reply_metadata=True)
+
+            return
 
         elif source == 'direct':
             return
-            #try:
+            # try:
             #    command_function = getattr(private, split_text[0])
             #    command_function(self, request_tweet_id, request_tweet_text, request_player, tweet)
-            #except:
+            # except:
             #    return
 
 

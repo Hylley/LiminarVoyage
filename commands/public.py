@@ -16,29 +16,10 @@ def daily(self, **kwargs):
         if (current_time - last_register).days < 1:
             return ['You\'ve already collected your daily chest.']
 
-    """chest = game.Chest('common')
-
-    for item in chest.items():
-        player.add_item(item[0], item[1])
-        player.update_internal_data('Last Daily Collect Date', current_time)
-
-    return {
-        'text': 'Boa meu mano.'
-    }"""
-
-
-def explore(self, **kwargs):
-    kwargs['request_player'].update_internal_data('Is Exploring', 1)
-    kwargs['request_player'].update_internal_data('Last Exploring Datetime', kwargs['tweet'].created_at)
-
 
 def inventory(self, **kwargs):
     player = kwargs['request_player']
-    page = 1
-
-    text = kwargs['request_tweet_text'].split()
-    if len(text) > 2:
-        page = int(text[2])
+    page = utils.find_int(kwargs['request_tweet_text'], 0) or 1
 
     inventory = player.inventory(50)
     items, max_pages = inventory[page-1], len(inventory)
@@ -63,7 +44,7 @@ def profile(self, **kwargs):
     # Player dataa
 
     player = kwargs['request_player']
-    user = self.api.get_user(screen_name=player.id)
+    user = self.api.get_user(screen_name=player.screen_name)
 
     bio = user.description
     image_url = user.profile_image_url_https.replace('_normal', '')
@@ -82,50 +63,59 @@ def profile(self, **kwargs):
 
     profile_card = image_processing.profile_card(
         image=image_url,
-        name=player.name,
-        health=player.player_data['Status']['Health'],
-        max_health=player.player_data['Status']['Max Health'],
+        name=player.player['name'],
+        health=player.player['health'],
+        max_health=player.internal['max_health'],
         progress=[
-            player.player_data['Progression']['Level'],
+            player.player['level'],
             [
-                player.player_data['Progression']['Experience'],
-                player.player_data['Progression']['Next Level Up Experience']
+                player.player['exp'],
+                player.internal['next_level_up_exp']
             ],
-            player.player_data['Progression']['Coins'],
+            player.player['grenag']
         ],
         values=[
-            player.player_data['Status']['Attack'],
-            player.player_data['Status']['Defense'],
-            player.player_data['Status']['Magic Power'],
+            player.status['attack'],
+            player.status['defense'],
+            player.status['magic_power']
         ],
         bio=bio,
         player_equipment_icon=icons
     )
 
-    image = self.api.media_upload(filename=f'{player.id}_profile_card', file=profile_card)
+    image = self.api.media_upload(filename=f'{player.screen_name}_profile_card', file=profile_card)
 
     return {
-        'text': f'{player.name}\'s profile:',
+        'text': f'{player.player["name"]}\'s profile:',
         'images': [image.media_id_string]
     }
 
 
 def equip(self, **kwargs):
     player = kwargs['request_player']
-    text = kwargs['request_tweet_text'].split()
+    text = kwargs['request_tweet_text']
 
-    text.pop(0)
-    item_id = int(text[0])
-    text.pop(0)
-    slot = text[0]
-    text.pop(0)
+    item_id = utils.find_int(text, 0)
 
-    response = player.equip(item_id, slot, text)
+    slots = {'head': 1, 'torso': 2, 'hand_1': 0, 'hand_2': 0, 'legs': 3}
+    slot = False
+    for key, value in slots:
+        if key in text:
+            slot = value
+
+    if not slot:
+        return {
+            'text': 'No valid slots provided.',
+            'images': None
+        }
+
+    response = player.equip(item_id, slot)
 
     if response:
         if isinstance(response, str):
             return {
-                'text': response
+                'text': response,
+                'images': None
             }
         else:
             return profile(self, **kwargs)
@@ -186,14 +176,16 @@ def roll(self, **kwargs):
 
 
 def add_item(self, **kwargs):
-    kwargs['request_player'].add_item('11037', 1)
-
+    kwargs['request_player'].add(11037, 1)
     return {
-        'text': "Ok meu brother."
+        'text': "Status: added 11037 of instance 1;",
+        'images': None
     }
 
 
-def coins(self, **kwargs):
+def remove_item(self, **kwargs):
+    kwargs['request_player'].subtract(11037, 1)
     return {
-        'text': str(kwargs['request_player'].get_coins())
+        'text': "Status: subtracted 11037 of instance 1;",
+        'images': None
     }

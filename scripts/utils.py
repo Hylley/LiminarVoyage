@@ -4,7 +4,7 @@ from random import randrange, getrandbits
 
 
 def filter_text(text):
-    text = re.sub(r"(?:\@|https?\://)\S+", "", str(text)).lstrip()
+    text = re.sub(r"(?:\@|https?\://)\S+", "", str(text)).lstrip().lower()
 
     return text
 
@@ -38,3 +38,10 @@ def refactor(num, div):
         division.insert(randrange(len(division) + 1), values[0] + values[1])
 
     return division
+
+
+def find_int(text, ind):
+    try:
+        return [int(s) for s in re.findall(r'\b\d+\b', text)][ind]
+    except:
+        return None

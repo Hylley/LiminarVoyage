@@ -1,12 +1,11 @@
 import sqlite3
-#from player import Player
 
 
 def connect(file):
-    return sqlite3.connect(f'database/{file}').cursor()
+    con = sqlite3.connect(f'database/{file}')
 
+    return con.cursor(), con
 
-#player = Player('Hyllley')
 
 """
     GAME RELATABLE FUNCTIONS:
@@ -17,22 +16,33 @@ def connect(file):
 
 def general_item(item_id):
     """
-        The 'general item' function search for a given id item info in both 'weapons' and
+        The 'general item' function search for a given id item info in both 'equipment' and
         'items' tables. Since all the objects in both tables have a unique and exclusive id,
         there's no conflict problem.
 
         (Even if it had, the 'items' table will have preference.)
     """
 
-    db = connect('game_side.db')
+    db, con = connect('game_side.db')
 
     result = db.execute(
         f'SELECT * FROM items WHERE id = {item_id}'
     ).fetchone() or db.execute(
-        f'SELECT * FROM weapons WHERE id = {item_id}'
+        f'SELECT * FROM equipment WHERE id = {item_id}'
     ).fetchone() or None
 
-    db.close()
+    con.close()
+    return result
+
+
+def equipment(armor_id):
+    db, con = connect('game_side.db')
+
+    result = db.execute(
+        f'SELECT * FROM equipment WHERE id = {armor_id}'
+    ).fetchone() or None
+
+    con.close()
     return result
 
 """
@@ -54,18 +64,23 @@ def private(key, value=None):
         If the key not found, return 'None'.
     """
 
-    db = connect('game_side.db')
+    db, con = connect('game_side.db')
 
     if not value:
         result = db.execute(
             f'SELECT value FROM private_data WHERE key = ?', [key]
         ).fetchone()[0] or None
 
-        db.close()
+        con.close()
         return result
+
+    try: value = str(value)     # Tries to convert variable to string, if not, then return;
+    except: return None
 
     db.execute(
         f'UPDATE private_data SET value = ? WHERE key = ?', [value, key]
     )
-    >>db.commit()<<
-    db.close()
+    print('Save:', value)
+
+    con.commit()
+    con.close()
